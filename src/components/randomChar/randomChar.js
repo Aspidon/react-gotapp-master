@@ -3,21 +3,25 @@ import './randomChar.css';
 import gotService from '../../services/gotService';
 import Spinner from '../spinner';
 import ErrorMessage from '../error';
-
-import { ThemeConsumer } from 'styled-components';
+//import { ThemeConsumer } from 'styled-components';
 
 export default class RandomChar extends Component {
 
-    constructor() {
-        super();
-        this.updateChar();
-    }
     gotService = new gotService();
 
     state = {
         char: {},
         loading: true,
         error: false
+    }
+
+    componentDidMount() {
+        this.updateChar();
+        this.timerId = setInterval(this.updateChar, 1500);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerId);
     }
 
     onCharLoaded = (char) => {
@@ -34,7 +38,7 @@ export default class RandomChar extends Component {
         })
     }
 
-    updateChar() {
+    updateChar = () => {
         const id = Math.floor(Math.random() * 140 + 25);
         this.gotService.getCharaster(id)
             .then(this.onCharLoaded)
@@ -61,7 +65,13 @@ export default class RandomChar extends Component {
 
 const View = ({char}) => {
 
-    const {name, gender, born, died, culture} = char;
+    let {name, gender, born, died, culture} = char;
+
+    if (name === '') name = "no data...";
+    if (gender === '') gender = "no data...";
+    if (born === '') born = "no data...";
+    if (died === '') died = "no data...";
+    if (culture === '') culture = "no data...";
 
     return (
         <>

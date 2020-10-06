@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {Col, Row, Container} from 'reactstrap';
 import Header from '../header';
 import RandomChar from '../randomChar';
-import ItemList from '../itemList';
-import CharDetails from '../charDetails';
+import CharacterPage from '../characterPage';
+import ErrorMessage from '../error';
 
 // const Btn = () => {
 //     return <button className='btn btn-first'>View/Hidden</button>;
@@ -44,12 +44,16 @@ import CharDetails from '../charDetails';
 
 export default class App extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            reset: true
-        }
-        this.onReset = this.onReset.bind(this);
+    state = {
+        reset: true,
+        error: false
+    }
+
+    componentDidCatch() {
+        console.log('error');
+        this.setState({
+            error: true
+        })
     }
         
     onReset = () => {
@@ -63,13 +67,17 @@ export default class App extends Component {
     render() {
 
         const Btn = () => {
-            return <button key='first' type='button' className='btn btn-first' onClick={this.onReset}>View/Hidden</button>;
+            return <button key='first' type='button' className='btn btn-primary' onClick={this.onReset}>View/Hidden</button>;
         }
 
         const reset = this.state.reset;
 
         const randomCharContent = reset ? <RandomChar/> : null;
 
+        if (this.state.error) {
+            return <ErrorMessage/>
+        }
+        
         return (
             <> 
                 <Container>
@@ -82,14 +90,7 @@ export default class App extends Component {
                             <Btn/>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col md='6'>
-                            <ItemList />
-                        </Col>
-                        <Col md='6'>
-                            <CharDetails />
-                        </Col>
-                    </Row>
+                    <CharacterPage/>
                 </Container>
             </>
 
