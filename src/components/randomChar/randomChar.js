@@ -2,13 +2,11 @@ import React, {Component} from 'react';
 import './randomChar.css';
 import gotService from '../../services/gotService';
 import Spinner from '../spinner';
-import ErrorMessage from '../error';
-//import { ThemeConsumer } from 'styled-components';
+import ErrorMessage from '../errorMessage';
 
 export default class RandomChar extends Component {
 
     gotService = new gotService();
-
     state = {
         char: {},
         loading: true,
@@ -17,10 +15,10 @@ export default class RandomChar extends Component {
 
     componentDidMount() {
         this.updateChar();
-        this.timerId = setInterval(this.updateChar, 1500);
+        this.timerId = setInterval(this.updateChar, 15000);
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(){
         clearInterval(this.timerId);
     }
 
@@ -39,19 +37,18 @@ export default class RandomChar extends Component {
     }
 
     updateChar = () => {
-        const id = Math.floor(Math.random() * 140 + 25);
-        this.gotService.getCharaster(id)
+        const id = Math.floor(Math.random()*140 + 25); //25-140
+        this.gotService.getCharacter(id)
             .then(this.onCharLoaded)
             .catch(this.onError);
     }
 
     render() {
-
-        const {char, loading, error} = this.state;
+        const { char, loading, error } = this.state;
 
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error) ? <View char = {char}/> : null;
+        const content = !(loading || error) ? <View char={char}/> : null;
 
         return (
             <div className="random-block rounded">
@@ -62,17 +59,8 @@ export default class RandomChar extends Component {
         );
     }
 }
-
 const View = ({char}) => {
-
-    let {name, gender, born, died, culture} = char;
-
-    if (name === '') name = "no data...";
-    if (gender === '') gender = "no data...";
-    if (born === '') born = "no data...";
-    if (died === '') died = "no data...";
-    if (culture === '') culture = "no data...";
-
+    const {name, gender, born, died, culture} = char;
     return (
         <>
             <h4>Random Character: {name}</h4>

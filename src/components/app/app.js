@@ -2,52 +2,22 @@ import React, {Component} from 'react';
 import {Col, Row, Container} from 'reactstrap';
 import Header from '../header';
 import RandomChar from '../randomChar';
-import CharacterPage from '../characterPage';
-import ErrorMessage from '../error';
+import ErrorMessage from '../errorMessage';
+import {CharacterPage, BooksPage, HousesPage, BooksItem} from '../pages';
+import gotService from '../../services/gotService';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
 
-// const Btn = () => {
-//     return <button className='btn btn-first'>View/Hidden</button>;
-// }
-
-// const onReset = () => {
-
-// }
-
-// const App = () => {
-//     return (
-//         <> 
-//             <Container>
-//                 <Header />
-//             </Container>
-//             <Container>
-//                 <Row>
-//                     <Col lg={{size: 5, offset: 0}}>
-//                         <RandomChar/>
-//                         <Btn onClick={this.onReset}/>
-//                     </Col>
-//                 </Row>
-//                 <Row>
-//                     <Col md='6'>
-//                         <ItemList />
-//                     </Col>
-//                     <Col md='6'>
-//                         <CharDetails />
-//                     </Col>
-//                 </Row>
-//             </Container>
-//         </>
-//     );
-// };
-
-// export default App;
+import './app.css';
 
 
 export default class App extends Component {
+    gotService = new gotService();
 
     state = {
-        reset: true,
-        error: false
-    }
+        showRandomChar: true,
+        error: false,
+        selectedHouse: 20
+    };
 
     componentDidCatch() {
         console.log('error');
@@ -55,45 +25,49 @@ export default class App extends Component {
             error: true
         })
     }
-        
-    onReset = () => {
-        let resetInv = this.state.reset;
-        console.log('click');
-        this.setState({
-            reset: !resetInv
+
+    toggleRandomChar = () => {
+        this.setState((state) => {
+            return {
+                showRandomChar: !state.showRandomChar
+            }
         });
-    }
+    };
+
 
     render() {
-
-        const Btn = () => {
-            return <button key='first' type='button' className='btn btn-primary' onClick={this.onReset}>View/Hidden</button>;
-        }
-
-        const reset = this.state.reset;
-
-        const randomCharContent = reset ? <RandomChar/> : null;
+        const char = this.state.showRandomChar ? <RandomChar/> : null;
 
         if (this.state.error) {
             return <ErrorMessage/>
         }
-        
-        return (
-            <> 
-                <Container>
-                    <Header />
-                </Container>
-                <Container>
-                    <Row>
-                        <Col lg={{size: 5, offset: 0}}>
-                            {randomCharContent}
-                            <Btn/>
-                        </Col>
-                    </Row>
-                    <CharacterPage/>
-                </Container>
-            </>
 
+        return (
+            <Router> 
+                <div className='app'>
+                    <Container>
+                        <Header />
+                    </Container>
+                    <Container>
+                        <Row>
+                            <Col lg={{size: 5, offset: 0}}>
+                            {char}
+                            <button 
+                                className="toggle-btn"
+                                onClick={this.toggleRandomChar}>Toggle random character</button>
+                            </Col>
+                        </Row>
+                        <Route path='/' component={() => <h1>Welcome to GOT DB</h1>} exact/>
+                        <Route path='/characters' component={CharacterPage} />
+                        <Route path='/books' component={BooksPage} exact/>
+                        <Route path='/books/:id' render={({match}) => {
+                            const {id} = match.params;
+                        return <BooksItem bookId={id}/>}}/>
+                        <Route path='/houses' component={HousesPage} />
+                    </Container>
+                </div>
+            </Router>
         )
     }
-}
+
+};
